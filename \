@@ -23,6 +23,7 @@ class DataBase(object):
 		else:
 			#right amount of arguments passed in. add them
 			self.rows.append(fields)
+		print(self.rows)
 
 	def save(self):
 		"""saves the database to name.txt under standard format"""
@@ -55,11 +56,10 @@ if __name__ == '__main__':
 	print("running tests on the database library")
 	print("checking DataBase class")
 	try:
-		testing = DataBase("users", "id", "first", "last")
+		testing = Database("id", "first", "last")
 		testing.add_entry(0, "Connor", "Dewar")
-		testing.add_entry(1, "John", "Smith")
-	except Exception as inst:
-		print("Checks failed with exception: {}".format(inst))
-		
+		testing.add_Entry(1, "John", "Smith")
+	except:
+		print("Checks failed")
 	else:	
 		print("Checks went OK")
