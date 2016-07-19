@@ -48,8 +48,24 @@ class DataBaseFromFile(DataBase):
 	"""loads a db from a file"""
 	def __init__(self, name):
 		"""the init functin for databse from file"""
-
-
+		#the input name should hold the path to db file
+		if not os.path.exists(name):
+			print("file does not exist")
+		else:
+			#path exists, so load and enter the database
+			parts = name.split("/")
+			self.name = parts[-1][:-4]
+			database_file = open(name, "r")
+			lines = database_file.readlines()
+			database_file.close()
+			processed_lines = []
+			for entry in lines:
+				processed_lines.append(entry.strip().split(","))
+			self.columns = processed_lines[0]
+			processed_lines.pop(0)
+			self.rows = []
+			for line in processed_lines:
+				self.rows.append(line)
 
 if __name__ == '__main__':
 	print("running tests on the database library")
