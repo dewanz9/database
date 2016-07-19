@@ -10,3 +10,16 @@ EG
 >>> users = Database_From_File('users.txt')
 This creates a database object from the text file
 
+
+
+
+
+format of a database file
+------------------------------------------
+users.csv
+-----------------------------------------
+
+id,first,last
+0,Connor,Dewar
+1,John,Doe
+2,Hello,World
