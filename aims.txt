@@ -1,0 +1,12 @@
+python database class aims
+---------------------------------
+When creating a new instance of the DataBase class there are two options
+the first applies when creating a empty database and filling it from there
+EG
+>>> users = DataBase('id', 'first', 'last', 'pass')
+This creates an empty databse with column titles of the arguments
+the second method applies when opening a database from a file
+EG
+>>> users = Database_From_File('users.txt')
+This creates a database object from the text file
+
