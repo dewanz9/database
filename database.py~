@@ -51,8 +51,40 @@ class DataBase(object):
 			os.remove(path)
 		file_to_write = open(path, "w")
 		for line in lines_to_write:
-			file_to_write.write(line)
+			file_to_write.write(line+"\n")
 		file_to_write.close()
+
+	def query(self, query_string):
+		"""runs a query on the database and returns a list of rows"""
+		commands = query_string.split(" ")
+		if commands[0] == "select":
+			#allgood
+			commands.pop(0) #select
+			commands.pop(0) #*
+			commands.pop(0) #where
+			#find the column index
+			target_index = -1
+			for _ in range(len(self.columns)):
+				if self.columns[_] == commands[0]:
+					target_index = _
+					break
+			if target_index == -1:
+				print("Column '{}' not found".format(commands[0]))
+			commands.pop(0)
+			commands.pop(0)#is
+			#find the rows
+			return_rows = []
+			for row in self.rows:
+				if row[target_index] == commands[0]:
+					return_rows.append(row)
+				else:
+					print(commands[0])
+					print("failed:", end='')
+					print(row[target_index])
+			return return_rows
+		else:
+			#not allgood
+			print("Command '{}' not recognized".format(commands[0]))
 
 
 

@@ -113,15 +113,4 @@ class DataBaseFromFile(DataBase):
 				self.rows.append(line)
 
 if __name__ == '__main__':
-	print("running tests on the database library")
-	print("checking DataBase class")
-	try:
-		testing = DataBase("users", "id", "first", "last")
-		testing.add_entry(0, "Connor", "Dewar")
-		testing.add_entry(1, "John", "Smith")
-		testing.save("./testing/")
-	except Exception as inst:
-		print("Checks failed with exception: {}".format(inst))
-		
-	else:	
-		print("Checks went OK")
+	print("Python database library")
