@@ -114,11 +114,14 @@ class DataBase(object):
 				status = "selecting_row"
 		
 	
-
+		#print(line_conditions)
 		"""query analysed now search is starting"""
+		#print(conditions)
+
 		rows_to_return = []
 		for i in range(len(self.rows)):
 			status = False
+			results = []
 			for condition in conditions:
 				column = condition[:-2]
 				equality = condition[-2:]
@@ -129,31 +132,51 @@ class DataBase(object):
 
 
 					if value == self.rows[i][column_id] or value == "any":
-						row_to_add = []
+						#row_to_add = []
+						#for column in columns_to_get:
+							#index = self.get_column_id(column)
+							#row_to_add.append(self.rows[i][index])
 
-						for column in columns_to_get:
-							index = self.get_column_id(column)
-							row_to_add.append(self.rows[i][index])
-
-						rows_to_return.append(row_to_add)
-		
+						#rows_to_return.append(row_to_add)
+						results.append(1)
+					else:
+						results.append(0)
 				elif equality == "ns":
 					string_to_search = self.rows[i][column_id]
 					current_letter = 0
+					results.append(0)
 					for j in range(len(string_to_search)-len(value)+1):
 						if current_letter == len(value):
+							results[-1] = 1
 							#found it
-							row_to_add = []
-							for column in columns_to_get:
-								index = self.get_column_id(column)
-								row_to_add.append(self.rows[i][index])
-							rows_to_return.append(row_to_add)
+							#row_to_add = []
+							#for column in columns_to_get:
+							#	index = self.get_column_id(column)
+							#	row_to_add.append(self.rows[i][index])
+							#rows_to_return.append(row_to_add)
 							break
 						if string_to_search[j] == value[current_letter]:
 							current_letter += 1
 						else:
 							current_letter = 0
 
+			status = results[0]
+			for k in range(len(results)-1):
+				if line_conditions[k]:
+					if status and results[k+1]:
+						status = True
+					else:
+						status = False
+				else:
+					if results[k+1]:
+						status = True
+			if status:
+				#found it
+				row_to_add = []
+				for column in columns_to_get:
+					index = self.get_column_id(column)
+					row_to_add.append(self.rows[i][index])
+				rows_to_return.append(row_to_add)
 
 		return rows_to_return
 
@@ -187,5 +210,5 @@ if __name__ == '__main__':
 	users = DataBase("users", "first", "last", "tags")
 	users.add_entry("connor", "dewar", "yolo swag")
 	users.add_entry("liam", "dewar", "cholo")
-	print(users.query("select tags where tags contains yolo"))
+	print(users.query("select * where tags contains yolo or first is liam"))
 	
