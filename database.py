@@ -4,7 +4,7 @@ The database class file
 import os
 
 class DataBase(object):
-	"""The database class for creating an empty database"""
+	"""The database class for creating a new database"""
 	def __init__(self, name, *columns):
 		"""The initializer for creating a new database"""
 		self.columns = list(columns)
@@ -12,7 +12,8 @@ class DataBase(object):
 		self.name = name
 	
 	def add_entry(self, *fields):
-		"""adds a new to entry to self.rows"""
+		"""adds a new to entry to self.rows
+		takes in strings, one for each column"""
 		#check to see if the right amount of args was passed in
 		fields = list(fields)
 		if len(fields) < len(self.columns):
@@ -55,7 +56,8 @@ class DataBase(object):
 		file_to_write.close()
 
 	def get_column_id(self, column_name):
-		"""returns the id of the given column name"""
+		"""returns the id of the given column name
+		returns the column id of a given column name"""
 		for i in range(len(self.columns)):
 			if self.columns[i] == column_name:
 				return i
@@ -132,12 +134,6 @@ class DataBase(object):
 
 
 					if value == self.rows[i][column_id] or value == "any":
-						#row_to_add = []
-						#for column in columns_to_get:
-							#index = self.get_column_id(column)
-							#row_to_add.append(self.rows[i][index])
-
-						#rows_to_return.append(row_to_add)
 						results.append(1)
 					else:
 						results.append(0)
@@ -148,12 +144,6 @@ class DataBase(object):
 					for j in range(len(string_to_search)-len(value)+1):
 						if current_letter == len(value):
 							results[-1] = 1
-							#found it
-							#row_to_add = []
-							#for column in columns_to_get:
-							#	index = self.get_column_id(column)
-							#	row_to_add.append(self.rows[i][index])
-							#rows_to_return.append(row_to_add)
 							break
 						if string_to_search[j] == value[current_letter]:
 							current_letter += 1
@@ -171,7 +161,6 @@ class DataBase(object):
 					if results[k+1]:
 						status = True
 			if status:
-				#found it
 				row_to_add = []
 				for column in columns_to_get:
 					index = self.get_column_id(column)
@@ -210,5 +199,5 @@ if __name__ == '__main__':
 	users = DataBase("users", "first", "last", "tags")
 	users.add_entry("connor", "dewar", "yolo swag")
 	users.add_entry("liam", "dewar", "cholo")
-	print(users.query("select * where tags contains yolo or first is liam"))
+	print(users.query("select last and first where tags contains yolo or first is liam"))
 	

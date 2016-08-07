@@ -54,38 +54,118 @@ class DataBase(object):
 			file_to_write.write(line+"\n")
 		file_to_write.close()
 
+	def get_column_id(self, column_name):
+		"""returns the id of the given column name"""
+		for i in range(len(self.columns)):
+			if self.columns[i] == column_name:
+				return i
+		return -1
+
 	def query(self, query_string):
 		"""runs a query on the database and returns a list of rows"""
 		commands = query_string.split(" ")
-		if commands[0] == "select":
-			#allgood
-			commands.pop(0) #select
-			commands.pop(0) #*
-			commands.pop(0) #where
-			#find the column index
-			target_index = -1
-			for _ in range(len(self.columns)):
-				if self.columns[_] == commands[0]:
-					target_index = _
-					break
-			if target_index == -1:
-				print("Column '{}' not found".format(commands[0]))
-			commands.pop(0)
-			commands.pop(0)#is
-			#find the rows
-			return_rows = []
-			for row in self.rows:
-				if row[target_index] == commands[0]:
-					return_rows.append(row)
+		columns_to_get = []
+		conditions = {}
+		status = "starting"
+		temporary = ""
+		line_conditions = []
+		for command in commands:
+			if status == "starting":
+				if command == 'select':
+					status = "selecting"
+			elif status == "selecting":
+				if command == "*":
+					for column in self.columns:
+						columns_to_get.append(column)
+						status = "deciding_and_where"
+				elif command in self.columns:
+					columns_to_get.append(command)
+					status = "deciding_and_where"
 				else:
-					print(commands[0])
-					print("failed:", end='')
-					print(row[target_index])
-			return return_rows
-		else:
-			#not allgood
-			print("Command '{}' not recognized".format(commands[0]))
+					print("Column: {} not found".format(command))
+					break
+			elif status == "deciding_and_where":
+				if command == "and":
+					status = "selecting"
+				elif command == "where":
+					status = "selecting_row"
+				else:
+					print("Command: {} not recognized".format(command))
+			elif status == "selecting_row":
+				temporary = command
+				status = "checking_equality"
+			elif status == "checking_equality":
+				equality = command
+				status = "adding_condition"
+			elif status == "adding_condition":
+				if equality == "is" or equality == "contains":
+					conditions[temporary + equality[-2:]] = command
+					status = "more_commands_maybe"
+				else:
+					print("Condition: {} not recognized".format(equality))
+					break
+			elif status == "more_commands_maybe":
+				if command == "and":
+					line_conditions.append(1)
+				elif command == "or":
+					line_conditions.append(0)
+				else:
+					print("equality: {} not recognized".format(command))
+				status = "selecting_row"
+		
+	
+		#print(line_conditions)
+		"""query analysed now search is starting"""
+		#print(conditions)
 
+		rows_to_return = []
+		for i in range(len(self.rows)):
+			status = False
+			results = []
+			for condition in conditions:
+				column = condition[:-2]
+				equality = condition[-2:]
+				value = conditions[condition]
+				column_id = self.get_column_id(column)
+
+				if equality == "is":
+
+
+					if value == self.rows[i][column_id] or value == "any":
+						results.append(1)
+					else:
+						results.append(0)
+				elif equality == "ns":
+					string_to_search = self.rows[i][column_id]
+					current_letter = 0
+					results.append(0)
+					for j in range(len(string_to_search)-len(value)+1):
+						if current_letter == len(value):
+							results[-1] = 1
+							break
+						if string_to_search[j] == value[current_letter]:
+							current_letter += 1
+						else:
+							current_letter = 0
+
+			status = results[0]
+			for k in range(len(results)-1):
+				if line_conditions[k]:
+					if status and results[k+1]:
+						status = True
+					else:
+						status = False
+				else:
+					if results[k+1]:
+						status = True
+			if status:
+				row_to_add = []
+				for column in columns_to_get:
+					index = self.get_column_id(column)
+					row_to_add.append(self.rows[i][index])
+				rows_to_return.append(row_to_add)
+
+		return rows_to_return
 
 
 
@@ -114,3 +194,8 @@ class DataBaseFromFile(DataBase):
 
 if __name__ == '__main__':
 	print("Python database library")
+	users = DataBase("users", "first", "last", "tags")
+	users.add_entry("connor", "dewar", "yolo swag")
+	users.add_entry("liam", "dewar", "cholo")
+	print(users.query("select last and first where tags contains yolo or first is liam"))
+	
